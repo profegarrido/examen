@@ -1,7 +1,17 @@
 import streamlit as st
 import pandas as pd
 import os
-import datetime # Para añadir la fecha y hora del envío
+import datetime
+
+# Ocultar menú de Streamlit (íconos, menú superior y pie de página)
+hide_streamlit_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- Configuración del Archivo CSV ---
 ARCHIVO_RESPUESTAS = 'respuestas_examen.csv'
@@ -50,54 +60,62 @@ with st.form("examen_form"):
 
     st.write("---")
 
-    # Botón de envío del formulario
+    # Botón de envío del formulario (ESTE SÍ DEBE ESTAR DENTRO DEL FORM)
     submitted = st.form_submit_button("Enviar Respuestas")
 
-    # --- Lógica para Guardar y Descargar Respuestas ---
-    if submitted:
-        if not id_participante:
-            st.error("Por favor, ingresa tu ID de Participante para enviar el examen.")
-        else:
-            marca_temporal = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+# --- Lógica para Guardar y Descargar Respuestas ---
+# ESTE BLOQUE AHORA ESTÁ FUERA DEL "with st.form(...)"
+if submitted:
+    if not id_participante:
+        st.error("Por favor, ingresa tu ID de Participante para enviar el examen.")
+    else:
+        marca_temporal = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            nueva_respuesta = pd.DataFrame([{
-                'Marca_Temporal': marca_temporal,
-                'ID_Participante': id_participante,
-                'Pregunta_1_Corta': q1,
-                'Pregunta_2_Multiple': q2,
-                'Pregunta_3_Corta': q3,
-                'Pregunta_4_Multiple': q4,
-                'Pregunta_5_Corta': q5,
-                'Pregunta_6_Multiple': q6,
-                'Pregunta_7_Corta': q7,
-                'Pregunta_8_Multiple': q8,
-                'Pregunta_9_Corta': q9,
-                'Pregunta_10_Multiple': q10
-            }])
+        nueva_respuesta = pd.DataFrame([{
+            'Marca_Temporal': marca_temporal,
+            'ID_Participante': id_participante,
+            'Pregunta_1_Corta': q1,
+            'Pregunta_2_Multiple': q2,
+            'Pregunta_3_Corta': q3,
+            'Pregunta_4_Multiple': q4,
+            'Pregunta_5_Corta': q5,
+            'Pregunta_6_Multiple': q6,
+            'Pregunta_7_Corta': q7,
+            'Pregunta_8_Multiple': q8,
+            'Pregunta_9_Corta': q9,
+            'Pregunta_10_Multiple': q10
+        }])
 
-            try:
-                df_respuestas = pd.read_csv(ARCHIVO_RESPUESTAS)
-            except Exception as e:
-                st.error(f"Error al leer el archivo de respuestas: {e}. Creando un DataFrame vacío.")
-                df_respuestas = pd.DataFrame(columns=COLUMNAS)
+        try:
+            df_respuestas = pd.read_csv(ARCHIVO_RESPUESTAS)
+        except Exception as e:
+            st.error(f"Error al leer el archivo de respuestas: {e}. Creando un DataFrame vacío.")
+            df_respuestas = pd.DataFrame(columns=COLUMNAS)
 
-            df_respuestas = pd.concat([df_respuestas, nueva_respuesta], ignore_index=True)
-            df_respuestas.to_csv(ARCHIVO_RESPUESTAS, index=False)
+        df_respuestas = pd.concat([df_respuestas, nueva_respuesta], ignore_index=True)
+        df_respuestas.to_csv(ARCHIVO_RESPUESTAS, index=False)
 
-            st.success("¡Respuestas enviadas y guardadas correctamente!")
-            st.info("Puedes descargar el archivo de respuestas completo a continuación.")
+        st.success("¡Respuestas enviadas y guardadas correctamente!")
+        st.info("Puedes descargar el archivo de respuestas completo a continuación.")
 
-            # --- Código para el botón de descarga ---
-            # Lee el contenido del archivo CSV para el botón de descarga
-            with open(ARCHIVO_RESPUESTAS, "rb") as file:
-                btn = st.download_button(
-                        label="Descargar Respuestas del Examen", # Texto del botón
-                        data=file,                               # Datos a descargar (el contenido del archivo)
-                        file_name=ARCHIVO_RESPUESTAS,            # Nombre del archivo cuando se descarga
-                        mime="text/csv"                          # Tipo MIME del archivo
-                    )
+# --- Botón de descarga fuera del formulario ---
+# Este botón debe estar SIEMPRE disponible o condicionalmente visible fuera del formulario.
+# Si lo quieres mostrar SOLO después de que alguien envíe, necesitarías usar st.session_state
+# para recordar que se ha enviado algo.
+# Por simplicidad para este ejemplo, lo pondremos siempre visible pero solo funcionará
+# si el archivo existe.
 
-            st.write("---")
-            # Opcional: Mostrar las respuestas guardadas directamente en la app
-            st.subheader("Todas las respuestas guardadas (en el servidor):")
-            st.dataframe(df_respuestas)
+if os.path.exists(ARCHIVO_RESPUESTAS): # Solo muestra el botón si el archivo existe
+    with open(ARCHIVO_RESPUESTAS, "rb") as file:
+        st.download_button(
+                label="Descargar TODAS las Respuestas Guardadas", # Texto del botón
+                data=file,                               # Datos a descargar
+                file_name=ARCHIVO_RESPUESTAS,            # Nombre del archivo al descargar
+                mime="text/csv"                          # Tipo MIME del archivo
+            )
+
+st.write("---")
+# Opcional: Mostrar las respuestas guardadas directamente en la app
+# st.subheader("Todas las respuestas guardadas (en el servidor):")
+# if os.path.exists(ARCHIVO_RESPUESTAS):
+#    st.dataframe(pd.read_csv(ARCHIVO_RESPUESTAS))
