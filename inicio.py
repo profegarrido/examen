@@ -3,6 +3,17 @@ import pandas as pd
 import os
 import datetime # Para añadir la fecha y hora del envío
 
+# Ocultar menú de Streamlit (íconos, menú superior y pie de página)
+hide_streamlit_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+# Ocultar menú de Streamlit (íconos, menú superior y pie de página)
+
 # --- Configuración del Archivo CSV ---
 ARCHIVO_RESPUESTAS = 'respuestas_examen.csv'
 
