@@ -29,19 +29,19 @@ st.write("---")
 st.header("Preguntas del Examen")
 
 q1_opciones = ["A) 42", "B) Hola Mundo", "C) 3.14159", "D) UAHC", "E) huemul"]
-q1 = st.radio("Pregunta 1: ¿Qué elemento imprimirá el código `mi_lista[-2]`?", q1_opciones, key="q1")
+q1 = st.radio("Pregunta 1: ¿Qué elemento imprimirá el código `mi_lista[-2]`?", q1_opciones, key="q1", index=None)
 
 q2 = st.text_area("Pregunta 2: ¿Cuál es el código para imprimir **Python** desde `mi_lista`?", key="q2")
 
 q3 = st.text_area("Pregunta 3: Crear una función que calcule el precio con IVA.", key="q3")
 
 q4_opciones = ["A) conda activate web", "B) activate conda web", "C) source web activate", "D) conda create web", "E) conda run web"]
-q4 = st.radio("Pregunta 4: ¿Cuál es el código para activar el entorno virtual `web` usando conda?", q4_opciones, key="q4")
+q4 = st.radio("Pregunta 4: ¿Cuál es el código para activar el entorno virtual `web` usando conda?", q4_opciones, key="q4", index=None)
 
 q5 = st.text_area("Pregunta 5: ¿Cuántas filas y columnas tiene el  DataFrame (pinguinos)?", key="q5")
 
 q6_opciones = ["A) 91%", "B) 92%", "C) 93%", "D) 94%", "E) 95%"]
-q6 = st.radio("Pregunta 6: ¿Cuál es el porcentaje general de completitud?", q6_opciones, key="q6")
+q6 = st.radio("Pregunta 6: ¿Cuál es el porcentaje general de completitud?", q6_opciones, key="q6", index=None)
 
 q7 = st.text_area("Pregunta 7: Si tuviera que imputar la columna **Body Mass (g)**, ¿qué método usaría y por qué?", key="q7")   
 
@@ -50,7 +50,7 @@ q8 = st.text_area("Pregunta 8: ¿Cuál es la especie mayoritaria y qué porcenta
 q9 = st.text_area("Pregunta 9: Graficar la columna body mass usando histograma de matplotlib", key="q9")
 
 q10_opciones = ["A) Biscoe: 15.1%, Dream: 36.0%, Torgersen: 48.8%", "B) Biscoe: 15.1%, Dream: 48.8%, Torgersen: 36.0%", "C) Biscoe: 36.0%, Dream: 48.8%, Torgersen: 15.1%", "D) Biscoe: 48.8%, Dream: 36.0%, Torgersen: 15.1%", "E) Biscoe: 48.8%, Dream: 15.1%, Torgersen: 36.0%"]
-q10 = st.radio("Pregunta 10: ¿Cuál es el porcentaje de pinguinos por isla (**island**)?", q10_opciones, key="q10")
+q10 = st.radio("Pregunta 10: ¿Cuál es el porcentaje de pinguinos por isla (**island**)?", q10_opciones, key="q10", index=None)
 
 # --- Armar DataFrame con respuestas ---
 respuestas = {
