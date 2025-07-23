@@ -1,121 +1,92 @@
 import streamlit as st
 import pandas as pd
-import os
+import io
 import datetime
-
-# Ocultar menú de Streamlit (íconos, menú superior y pie de página)
-hide_streamlit_style = """
-        <style>
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
-        </style>
-        """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-
-# --- Configuración del Archivo CSV ---
-ARCHIVO_RESPUESTAS = 'respuestas_examen.csv'
-
-# Columnas iniciales del CSV
-COLUMNAS = [
-    'Marca_Temporal', 'ID_Participante', 'Pregunta_1_Corta', 'Pregunta_2_Multiple',
-    'Pregunta_3_Corta', 'Pregunta_4_Multiple', 'Pregunta_5_Corta',
-    'Pregunta_6_Multiple', 'Pregunta_7_Corta', 'Pregunta_8_Multiple',
-    'Pregunta_9_Corta', 'Pregunta_10_Multiple'
-]
-
-# Crear el archivo CSV si no existe
-if not os.path.exists(ARCHIVO_RESPUESTAS):
-    df_vacio = pd.DataFrame(columns=COLUMNAS)
-    df_vacio.to_csv(ARCHIVO_RESPUESTAS, index=False)
+from io import StringIO
 
 # --- Título y Descripción del Formulario ---
-st.title("📝 Examen de Prueba de Conocimientos")
+st.title("📝 Examen")
+st.header("Introducción a la programación con Python y R")
 st.write("Por favor, responde las siguientes 10 preguntas.")
 st.write("---")
 
-# --- Formulario de Preguntas ---
-with st.form("examen_form"):
-    st.header("Sección de Datos del Participante")
-    id_participante = st.text_input("Ingresa tu ID de Participante:")
-    st.write("---")
-
-    st.header("Preguntas del Examen")
-
-    q1 = st.text_area("Pregunta 1: ¿Cuál es la capital de Chile?", key="q1_corta")
-    q2_opciones = ["A) Rojo", "B) Azul", "C) Verde", "D) Amarillo"]
-    q2 = st.radio("Pregunta 2: ¿De qué color es el cielo en un día soleado?", q2_opciones, key="q2_multiple")
-    q3 = st.text_area("Pregunta 3: Menciona un animal mamífero.", key="q3_corta")
-    q4_opciones = ["A) Sol", "B) Marte", "C) Tierra", "D) Júpiter"]
-    q4 = st.radio("Pregunta 4: ¿Cuál es el tercer planeta del sistema solar?", q4_opciones, key="q4_multiple")
-    q5 = st.text_area("Pregunta 5: ¿Qué lenguaje de programación estamos usando en Streamlit?", key="q5_corta")
-    q6_opciones = ["A) 1", "B) 2", "C) 3", "D) 4"]
-    q6 = st.radio("Pregunta 6: ¿Cuántos lados tiene un triángulo?", q6_opciones, key="q6_multiple")
-    q7 = st.text_area("Pregunta 7: Nombra una fruta cítrica.", key="q7_corta")
-    q8_opciones = ["A) Agua", "B) Oxígeno", "C) Hierro", "D) Nitrógeno"]
-    q8 = st.radio("Pregunta 8: ¿Cuál es el gas más abundante en la atmósfera terrestre?", q8_opciones, key="q8_multiple")
-    q9 = st.text_area("Pregunta 9: ¿Qué herramienta de visualización de datos usamos con Python?", key="q9_corta")
-    q10_opciones = ["A) Marte", "B) Venus", "C) Luna", "D) Sol"]
-    q10 = st.radio("Pregunta 10: ¿Cuál es la estrella más cercana a la Tierra?", q10_opciones, key="q10_multiple")
-
-    st.write("---")
-
-    # Botón de envío del formulario (ESTE SÍ DEBE ESTAR DENTRO DEL FORM)
-    submitted = st.form_submit_button("Enviar Respuestas")
-
-# --- Lógica para Guardar y Descargar Respuestas ---
-# ESTE BLOQUE AHORA ESTÁ FUERA DEL "with st.form(...)"
-if submitted:
-    if not id_participante:
-        st.error("Por favor, ingresa tu ID de Participante para enviar el examen.")
-    else:
-        marca_temporal = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        nueva_respuesta = pd.DataFrame([{
-            'Marca_Temporal': marca_temporal,
-            'ID_Participante': id_participante,
-            'Pregunta_1_Corta': q1,
-            'Pregunta_2_Multiple': q2,
-            'Pregunta_3_Corta': q3,
-            'Pregunta_4_Multiple': q4,
-            'Pregunta_5_Corta': q5,
-            'Pregunta_6_Multiple': q6,
-            'Pregunta_7_Corta': q7,
-            'Pregunta_8_Multiple': q8,
-            'Pregunta_9_Corta': q9,
-            'Pregunta_10_Multiple': q10
-        }])
-
-        try:
-            df_respuestas = pd.read_csv(ARCHIVO_RESPUESTAS)
-        except Exception as e:
-            st.error(f"Error al leer el archivo de respuestas: {e}. Creando un DataFrame vacío.")
-            df_respuestas = pd.DataFrame(columns=COLUMNAS)
-
-        df_respuestas = pd.concat([df_respuestas, nueva_respuesta], ignore_index=True)
-        df_respuestas.to_csv(ARCHIVO_RESPUESTAS, index=False)
-
-        st.success("¡Respuestas enviadas y guardadas correctamente!")
-        st.info("Puedes descargar el archivo de respuestas completo a continuación.")
-
-# --- Botón de descarga fuera del formulario ---
-# Este botón debe estar SIEMPRE disponible o condicionalmente visible fuera del formulario.
-# Si lo quieres mostrar SOLO después de que alguien envíe, necesitarías usar st.session_state
-# para recordar que se ha enviado algo.
-# Por simplicidad para este ejemplo, lo pondremos siempre visible pero solo funcionará
-# si el archivo existe.
-
-if os.path.exists(ARCHIVO_RESPUESTAS): # Solo muestra el botón si el archivo existe
-    with open(ARCHIVO_RESPUESTAS, "rb") as file:
-        st.download_button(
-                label="Descargar TODAS las Respuestas Guardadas", # Texto del botón
-                data=file,                               # Datos a descargar
-                file_name=ARCHIVO_RESPUESTAS,            # Nombre del archivo al descargar
-                mime="text/csv"                          # Tipo MIME del archivo
-            )
-
+# --- Sección de Datos del Alumno ---
+st.header("Sección de Datos del Alumno")
+id_participante = st.text_input("Ingresa tu Nombre:")
 st.write("---")
-# Opcional: Mostrar las respuestas guardadas directamente en la app
-# st.subheader("Todas las respuestas guardadas (en el servidor):")
-# if os.path.exists(ARCHIVO_RESPUESTAS):
-#    st.dataframe(pd.read_csv(ARCHIVO_RESPUESTAS))
+
+# --- Preguntas del Examen ---
+st.header("Preguntas del Examen")
+
+q1_opciones = ["A) 42", "B) Hola Mundo", "C) 3.14159", "D) UAHC", "E) huemul"]
+q1 = st.radio("Pregunta 1: ¿Qué elemento imprimirá el código `mi_lista[-2]`?", q1_opciones, key="q1")
+
+q2 = st.text_area("Pregunta 2: ¿Cuál es el código para imprimir **Python** desde `mi_lista`?", key="q2")
+
+q3 = st.text_area("Pregunta 3: Crear una función que calcule el precio con IVA.", key="q3")
+
+q4_opciones = ["A) conda activate web", "B) activate conda web", "C) source web activate", "D) conda create web", "E) conda run web"]
+q4 = st.radio("Pregunta 4: ¿Cuál es el código para activar el entorno virtual `web` usando conda?", q4_opciones, key="q4")
+
+q5 = st.text_area("Pregunta 5: ¿Cuántas filas y columnas tiene el  DataFrame (pinguinos)?", key="q5")
+
+q6_opciones = ["A) 91%", "B) 92%", "C) 93%", "D) 94%", "E) 95%"]
+q6 = st.radio("Pregunta 6: ¿Cuál es el porcentaje general de completitud?", q6_opciones, key="q6")
+
+q7 = st.text_area("Pregunta 7: Si tuviera que imputar la columna **Body Mass (g)**, ¿qué método usaría y por qué?", key="q7")   
+
+q8 = st.text_area("Pregunta 8: ¿Cuál es la especie mayoritaria y qué porcentaje es?", key="q8")
+
+q9 = st.text_area("Pregunta 9: Graficar la columna body mass usando histograma de matplotlib", key="q9")
+
+q10_opciones = ["A) Biscoe: 15.1%, Dream: 36.0%, Torgersen: 48.8%", "B) Biscoe: 15.1%, Dream: 48.8%, Torgersen: 36.0%", "C) Biscoe: 36.0%, Dream: 48.8%, Torgersen: 15.1%", "D) Biscoe: 48.8%, Dream: 36.0%, Torgersen: 15.1%", "E) Biscoe: 48.8%, Dream: 15.1%, Torgersen: 36.0%"]
+q10 = st.radio("Pregunta 10: ¿Cuál es el porcentaje de pinguinos por isla?", q10_opciones, key="q10")
+
+# --- Armar DataFrame con respuestas ---
+respuestas = {
+    "Nombre": [id_participante],
+    "Fecha": [datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
+    "Pregunta 1": [q1],
+    "Pregunta 2": [q2],
+    "Pregunta 3": [q3],
+    "Pregunta 4": [q4],
+    "Pregunta 5": [q5],
+    "Pregunta 6": [q6],
+    "Pregunta 7": [q7],
+    "Pregunta 8": [q8],
+    "Pregunta 9": [q9],
+    "Pregunta 10": [q10],
+}
+
+# Convertir a DataFrame de dos columnas
+df_respuestas = pd.DataFrame(respuestas.items(), columns=["campo", "respuesta"])
+
+# Convertir a CSV en memoria
+csv_buffer = StringIO()
+df_respuestas.to_csv(csv_buffer, index=False)
+csv_data = csv_buffer.getvalue()
+
+st.download_button(
+    label="📥 Enviar mis respuestas",
+    data=csv_data,
+    file_name=f"respuestas_{id_participante.replace(' ', '_')}.csv",
+    mime="text/csv"
+)
+
+# df_respuestas = pd.DataFrame(respuestas)
+
+# # --- Convertir a CSV en memoria ---
+# csv_buffer = io.StringIO()
+# df_respuestas.to_csv(csv_buffer, index=False)
+# csv_data = csv_buffer.getvalue()
+
+# # --- Botón para descargar las respuestas del alumno ---
+# st.download_button(
+#     label="📥 Enviar respuestas",
+#     data=csv_data,
+#     file_name=f"respuestas_examen_{id_participante or 'alumno'}.csv",
+#     mime="text/csv",
+#     disabled=(id_participante.strip() == "")
+# )
+
+# st.info("Recuerda guardar tu archivo CSV como comprobante de envío.")
