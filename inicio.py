@@ -4,6 +4,16 @@ import io
 import datetime
 from io import StringIO
 
+# Ocultar menú de Streamlit (íconos, menú superior y pie de página)
+hide_streamlit_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 # --- Título y Descripción del Formulario ---
 st.title("📝 Examen")
 st.header("Introducción a la programación con Python y R")
