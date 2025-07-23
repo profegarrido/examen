@@ -16,7 +16,7 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- Título y Descripción del Formulario ---
 st.title("📝 Examen")
-st.header("Introducción a la programación con Python y R")
+st.subheader("Introducción a la programación con Python y R")
 st.write("Por favor, responde las siguientes 10 preguntas.")
 st.write("---")
 
@@ -50,7 +50,7 @@ q8 = st.text_area("Pregunta 8: ¿Cuál es la especie mayoritaria y qué porcenta
 q9 = st.text_area("Pregunta 9: Graficar la columna body mass usando histograma de matplotlib", key="q9")
 
 q10_opciones = ["A) Biscoe: 15.1%, Dream: 36.0%, Torgersen: 48.8%", "B) Biscoe: 15.1%, Dream: 48.8%, Torgersen: 36.0%", "C) Biscoe: 36.0%, Dream: 48.8%, Torgersen: 15.1%", "D) Biscoe: 48.8%, Dream: 36.0%, Torgersen: 15.1%", "E) Biscoe: 48.8%, Dream: 15.1%, Torgersen: 36.0%"]
-q10 = st.radio("Pregunta 10: ¿Cuál es el porcentaje de pinguinos por isla?", q10_opciones, key="q10")
+q10 = st.radio("Pregunta 10: ¿Cuál es el porcentaje de pinguinos por isla (**island**)?", q10_opciones, key="q10")
 
 # --- Armar DataFrame con respuestas ---
 respuestas = {
